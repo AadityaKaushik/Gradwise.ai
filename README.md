@@ -128,7 +128,6 @@ This currently runs basic query layer tests.
 
 **Aaditya Kaushik**
 B.Tech ICT
-Founder — Gradwise AI
 
 ---
 
