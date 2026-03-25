@@ -1,4 +1,22 @@
 from database.connection import get_connection
+from Utils.security import generate_org_key
+
+def create_org(name, code, type, created_at):
+    org_key = generate_org_key();
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        query = """
+        INSERT INTO v1.organization (name, code, type, org_signup_key)
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (name, code, type, org_key))
+        org_id = cursor.fetchone()[0]
+        cursor.commit()
+        return org_id
+    finally:
+        cursor.close()
+
 
 def create_user(org_id, email, password_hash, role):
     conn = get_connection()
