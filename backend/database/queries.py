@@ -18,3 +18,17 @@ def create_user(org_id, email, password_hash, role):
 
     finally:
         conn.close()
+
+def get_user_by_email(email):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        query = """
+        SELECT user_id FROM v1.users
+        WHERE email = %s
+        """
+        cursor.execute(query, (email,))
+        user_id = cursor.fetchone()[0]
+        return user_id
+    finally:
+        conn.close()
