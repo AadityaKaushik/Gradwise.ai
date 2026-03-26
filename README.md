@@ -25,13 +25,25 @@ gradwise-ai/
 └── backend/
     │
     ├── database/
-    │   ├── connection.py      # PostgreSQL connection handling
-    │   └── queries.py         # Raw SQL query functions
+    │   ├── connection.py
+    │   ├── organization_queries.py
+    │   ├── user_queries.py
+    │   ├── membership_queries.py
+    │   └── __init__.py
     │
-    ├── main.py                # Temporary execution / testing entry point
-    ├── requirements.txt       # Python dependencies
-    ├── .env                   # Environment configuration (ignored by git)
-    └── .gitignore             # Git ignore rules
+    ├── services/                     # business logic layer (coming soon)
+    │   ├── auth_service.py
+    │   ├── organization_service.py
+    │   └── __init__.py
+    │
+    ├── utils/
+    │   └── security.py               # key generation, hashing helpers
+    │
+    ├── main.py                       # temporary testing entry point
+    │
+    ├── requirements.txt
+    ├── .env                          # ignored
+    └── .gitignore
 ```
 
 ---
