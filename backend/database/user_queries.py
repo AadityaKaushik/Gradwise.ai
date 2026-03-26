@@ -25,7 +25,9 @@ def get_user_by_email(email):
     try:
         cursor = conn.cursor()
         query = """
-        SELECT user_id, email, password_hash FROM v2.users
+        SELECT user_id, email, password_hash, role FROM v2.users
+        JOIN v2.organization_memberships
+        ON v2.organization_memberships.user_id = v2.users.user_id
         WHERE email = %s
         """
         cursor.execute(query, (email,))

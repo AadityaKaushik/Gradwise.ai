@@ -31,3 +31,19 @@ def join_organization(user_id, invite_key, role):
 
     finally:
         conn.close()
+
+    
+def get_organizations(user_id):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT organization_id, role FROM v2.organization_memberships
+            WHERE user_id = %s
+        """
+        cursor.execute(query, (user_id,))
+        orgs = cursor.fetchall()
+        cursor.close()
+        return orgs
+    finally:
+        conn.close()
