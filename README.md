@@ -1,25 +1,34 @@
-# 🎓 Gradwise.ai
+<p align="center">
+  <img src="assets/logo.png" alt="Gradwise Logo" width="420"/>
+</p>
 
-**Gradwise AI**, an academic intelligence platform designed to help educational institutions manage student data, academic workflows, and enable AI-driven insights.
-
-This repository currently contains the **initial backend data layer**, including database connectivity, raw SQL query modules, and foundational project structure for future API and AI integration.
+<h1 align="center">Gradwise.ai</h1>
+<p align="center"><b>Your AI-powered academic intelligence platform</b></p>
 
 ---
 
-## 🚀 Project Goal
+## 🚀 Overview
 
-Gradwise aims to build a centralized academic system where:
+**Gradwise AI** is an academic intelligence platform designed to help educational institutions manage student data, streamline academic workflows, and unlock AI-driven insights.
+
+This repository currently contains the **foundational backend data layer**, including database connectivity, raw SQL query modules, and a scalable project structure for future API and AI integration.
+
+---
+
+## 🎯 Project Vision
+
+Gradwise aims to become a centralized academic system where:
 
 * Students can track attendance, grades, enrollment, and performance
-* Institutions can manage organizational data and academic structures
-* AI modules can later provide personalized academic insights
+* Institutions can manage organizational and academic structures
+* AI modules provide personalized academic insights
 * Backend services act as the **core data pipeline** powering intelligent features
 
 ---
 
-## 🧱 Current Backend Architecture (As of 25/03/2026)
+## 🧱 Backend Architecture
 
-```text
+```
 gradwise-ai/
 │
 └── backend/
@@ -31,18 +40,18 @@ gradwise-ai/
     │   ├── membership_queries.py
     │   └── __init__.py
     │
-    ├── services/                     # business logic layer (coming soon)
+    ├── services/                     
     │   ├── auth_service.py
     │   ├── organization_service.py
     │   └── __init__.py
     │
     ├── utils/
-    │   └── security.py               # key generation, hashing helpers
+    │   └── security.py               
     │
-    ├── main.py                       # temporary testing entry point
+    ├── main.py                       
     │
     ├── requirements.txt
-    ├── .env                          # ignored
+    ├── .env                          
     └── .gitignore
 ```
 
@@ -50,44 +59,43 @@ gradwise-ai/
 
 ## 🗄️ Database Layer
 
-* Database: **PostgreSQL**
-* Access method: **psycopg2 (raw SQL — no ORM)**
-* Schema-driven relational design
-* Query functions written per entity to support future feature-driven expansion
+* **Database:** PostgreSQL
+* **Driver:** psycopg2 (raw SQL — no ORM)
+* **Design:** Schema-driven relational structure
 
-Current development focuses on:
+### Current Focus:
 
 * Connection lifecycle management
 * Insert / fetch query pipelines
-* Structured data access layer foundation
+* Modular query functions per entity
 
 ---
 
-## ⚙️ Local Setup Instructions
+## ⚙️ Local Setup
 
-### 1️⃣ Clone repository
+### 1️⃣ Clone Repository
 
 ```bash
 git clone <repo-url>
 cd gradwise-ai
 ```
 
-### 2️⃣ Create and activate virtual environment
+### 2️⃣ Create Virtual Environment
 
 ```bash
 python -m venv backend/venv
-backend/venv\Scripts\activate     # Windows
+backend/venv\Scripts\activate   # Windows
 ```
 
-### 3️⃣ Install dependencies
+### 3️⃣ Install Dependencies
 
 ```bash
 pip install -r backend/requirements.txt
 ```
 
-### 4️⃣ Configure environment variables
+### 4️⃣ Configure Environment Variables
 
-Create a `.env` file inside the `backend` directory:
+Create a `.env` file inside `backend/`:
 
 ```env
 DB_HOST=localhost
@@ -97,42 +105,40 @@ DB_PASSWORD=your_password
 DB_PORT=5432
 ```
 
-⚠️ This file must **not be committed to Git.**
+⚠️ Do NOT commit this file.
 
 ---
 
-### ▶️ Running the backend test entry
-
-From project root:
+## ▶️ Running the Backend
 
 ```bash
 python backend/main.py
 ```
 
-This currently runs basic query layer tests.
+Currently used for testing database queries and connectivity.
 
 ---
 
-## 📌 Development Philosophy
+## 🧠 Development Philosophy
 
-* Build **feature-driven query layers**, not entire schema logic upfront
-* Maintain clean separation between:
+* Build **feature-driven query layers**, not over-engineered systems
+* Maintain clear separation between:
 
-  * data access logic
-  * business logic (future service layer)
-  * API routing layer (future FastAPI integration)
-* Prioritize working data pipelines before scaling architecture
+  * Data access layer
+  * Business logic (services)
+  * API layer (future FastAPI)
+* Focus on **working pipelines before scaling complexity**
 
 ---
 
-## 🔮 Planned Roadmap
+## 🔮 Roadmap
 
-* Complete CRUD query coverage for core entities
-* Introduce service layer abstraction
-* Integrate FastAPI REST endpoints
-* Implement authentication and role-based access
-* Add AI integration (LLM-powered academic assistance)
-* Deployment and cloud infrastructure setup
+* [ ] Complete CRUD operations for core entities
+* [ ] Expand service layer
+* [ ] Integrate FastAPI APIs
+* [ ] Implement authentication & role-based access
+* [ ] Add AI-powered academic insights
+* [ ] Deploy to cloud infrastructure
 
 ---
 
@@ -143,4 +149,6 @@ B.Tech ICT
 
 ---
 
-> This backend is currently in foundational development phase and will evolve into a scalable academic intelligence platform.
+<p align="center">
+  <i>Building the infrastructure for intelligent academic systems.</i>
+</p>
