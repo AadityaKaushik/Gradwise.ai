@@ -1,8 +1,6 @@
 <p align="center">
   <img src="assets/logo.png" alt="Gradwise Logo" width="420"/>
 </p>
-
-<h1 align="center">Gradwise.ai</h1>
 <p align="center"><b>Your AI-powered academic intelligence platform</b></p>
 
 ---
