@@ -1,4 +1,4 @@
-# 🎓 Gradwise AI
+# 🎓 Gradwise.ai
 
 **Gradwise AI**, an academic intelligence platform designed to help educational institutions manage student data, academic workflows, and enable AI-driven insights.
 
