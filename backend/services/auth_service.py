@@ -10,7 +10,7 @@ def signup_user(email, password):
         raise Exception("User already exists")
 
     hashed_password = hash_password(password)
-    user_id = create_user(email, hashed_password)
+    user_id = create_user(email, hashed_password)["user_id"]
 
     return {
         "message": "User created successfully",
