@@ -2,7 +2,7 @@ from database.membership_queries import create_membership
 from database.connection import get_connection
 from datetime import datetime, timezone
 
-def join_organization(user_id, invite_key, role):
+def join_organization(user_id, invite_key):
     conn = get_connection()
     try:
         cursor = conn.cursor()
@@ -12,7 +12,7 @@ def join_organization(user_id, invite_key, role):
             FROM v2.organizations
             WHERE invite_key = %s
         """
-
+    
         cursor.execute(query, (invite_key,))
         row = cursor.fetchone()
 
@@ -27,6 +27,7 @@ def join_organization(user_id, invite_key, role):
             return None
 
         cursor.close()
+        role = student
         return create_membership(user_id, org_id, role)
 
     finally:
