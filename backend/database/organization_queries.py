@@ -1,9 +1,14 @@
 from database.connection import get_connection
 from Utils.security import generate_org_key
+from database.membership_queries import create_membership
 
 
-def create_org(name):
+from database.connection import get_connection
+from Utils.security import generate_org_key
+
+def create_org(name, user_id):
     conn = get_connection()
+    cursor = None
     try:
         cursor = conn.cursor()
 
@@ -11,9 +16,8 @@ def create_org(name):
             "SELECT organization_id FROM v2.organizations WHERE name = %s",
             (name,)
         )
-        existing = cursor.fetchone()
 
-        if existing:
+        if cursor.fetchone():
             raise ValueError("Organization with this name already exists")
 
         org_key = generate_org_key()
@@ -25,6 +29,13 @@ def create_org(name):
         """, (name, org_key))
 
         org_id = cursor.fetchone()[0]
+
+        cursor.execute("""
+            INSERT INTO v2.organization_memberships (user_id, organization_id, role)
+            VALUES (%s, %s, %s)
+        """, (user_id, org_id, "Admin"))
+        # membership_result = create_membership(user_id, org_id, "Admin")
+
         conn.commit()
 
         return {
@@ -37,7 +48,8 @@ def create_org(name):
         raise e
 
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
         conn.close()
 
 
