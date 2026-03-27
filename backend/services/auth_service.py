@@ -8,6 +8,7 @@ def signup_user(email, password):
     existing_user = get_user_by_email(email)
     if existing_user:
         raise Exception("User already exists")
+
     hashed_password = hash_password(password)
     user_id = create_user(email, hashed_password)
 
@@ -26,6 +27,7 @@ def login_user(email, password):
 
     if not verify_password(password, hash_stored):
         raise Exception("Invalid credentials")
+
     return {
         "message": "Login successful",
         "user_id": user_id

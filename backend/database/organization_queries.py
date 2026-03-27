@@ -5,17 +5,74 @@ from Utils.security import generate_org_key
 def create_org(name):
     conn = get_connection()
     try:
-        org_key = generate_org_key()
         cursor = conn.cursor()
-        query = """
-        INSERT INTO v2.organizations (name, invite_key)
-        VALUES (%s, %s)
-        RETURNING organization_id
-        """
-        cursor.execute(query, (name, org_key))
+
+        cursor.execute(
+            "SELECT organization_id FROM v2.organizations WHERE name = %s",
+            (name,)
+        )
+        existing = cursor.fetchone()
+
+        if existing:
+            raise ValueError("Organization with this name already exists")
+
+        org_key = generate_org_key()
+
+        cursor.execute("""
+            INSERT INTO v2.organizations (name, invite_key)
+            VALUES (%s, %s)
+            RETURNING organization_id
+        """, (name, org_key))
+
         org_id = cursor.fetchone()[0]
         conn.commit()
-        cursor.close()
-        return org_id, org_key
+
+        return {
+            "organization_id": org_id,
+            "invite_key": org_key
+        }
+
+    except Exception as e:
+        conn.rollback()
+        raise e
+
     finally:
+        cursor.close()
         conn.close()
+
+
+def get_org_by_invite_key(invite_key):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+
+        query = """
+            SELECT organization_id, invite_expires_at
+            FROM v2.organizations
+            WHERE invite_key = %s
+        """
+
+        cursor.execute(query, (invite_key,))
+
+        result = cursor.fetchone()
+
+        if not result:
+            raise ValueError("Invalid invite key")
+
+        org_id = result[0]
+        key_expiry = result[1]
+
+    
+        return {
+            "org_id": org_id,
+            "key_expiry": key_expiry
+        }
+    
+    except Exception as e:
+        conn.rollback()
+        raise e
+
+    finally:
+        cursor.close()
+        conn.close()
+        

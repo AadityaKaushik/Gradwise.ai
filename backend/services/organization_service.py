@@ -2,49 +2,59 @@ from database.membership_queries import create_membership
 from database.connection import get_connection
 from datetime import datetime, timezone
 
+from datetime import datetime
+
 def join_organization(user_id, invite_key):
     conn = get_connection()
+    cursor = None
     try:
         cursor = conn.cursor()
 
-        query = """
+        cursor.execute("""
             SELECT organization_id, invite_expires_at
             FROM v2.organizations
             WHERE invite_key = %s
-        """
-    
-        cursor.execute(query, (invite_key,))
+        """, (invite_key,))
+
         row = cursor.fetchone()
 
-        if row is None:
-            return None   
+        if not row:
+            raise ValueError("Invalid invite key")
 
         org_id, expiry_time = row
 
-        now = datetime.utcnow()
+        if expiry_time and expiry_time < datetime.utcnow():
+            raise ValueError("Invite key expired")
 
-        if expiry_time is not None and expiry_time < now:
-            return None
+        role = "student"
 
-        cursor.close()
-        role = student
         return create_membership(user_id, org_id, role)
 
     finally:
+        if cursor:
+            cursor.close()
         conn.close()
-
     
 def get_organizations(user_id):
     conn = get_connection()
+    cursor = None
     try:
         cursor = conn.cursor()
-        query = """
-            SELECT organization_id, role FROM v2.organization_memberships
+
+        cursor.execute("""
+            SELECT organization_id, role 
+            FROM v2.organization_memberships
             WHERE user_id = %s
-        """
-        cursor.execute(query, (user_id,))
-        orgs = cursor.fetchall()
-        cursor.close()
-        return orgs
+        """, (user_id,))
+
+        rows = cursor.fetchall()
+
+        return [
+            {"organization_id": org_id, "role": role}
+            for org_id, role in rows
+        ]
+
     finally:
+        if cursor:
+            cursor.close()
         conn.close()
