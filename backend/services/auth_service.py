@@ -19,14 +19,15 @@ def signup_user(email, password):
 
 def login_user(email, password):
     existing_user = get_user_by_email(email)
+
     if not existing_user:
         raise Exception("Invalid credentials")
 
-    hash_stored = existing_user[2]
-    user_id = existing_user[0]
+    hash_stored = existing_user["password_hash"]
+    user_id = existing_user["user_id"]
 
     if not verify_password(password, hash_stored):
-        raise Exception("Invalid credentials")
+        raise ValueError("Invalid credentials")
 
     return {
         "message": "Login successful",
