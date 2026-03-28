@@ -18,4 +18,14 @@ def view_perms(org_id):
                     END
             """, (org_id,))
             result = cursor.fetchall()
-
+            return [
+                {"user_id": row[0], "role": row[1]}
+                for row in result
+            ]
+        except Exception as e:
+            print("Error in view_perms:", e)
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            conn.close()
