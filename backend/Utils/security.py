@@ -20,7 +20,7 @@ def verify_password(to_check, stored):
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 
-SECRET_KEY = "AADITYAKAUSHIK1234"
+SECRET_KEY = "Gradwise@2026"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
@@ -39,3 +39,23 @@ def verify_access_token(token: str):
         return payload
     except JWTError:
         return None
+
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from Utils.security import verify_access_token
+
+security = HTTPBearer()
+
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials  # extracts the actual token string
+
+    payload = verify_access_token(token)
+
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
+        )
+
+    return payload  # contains user_id (and anything else you encoded)
