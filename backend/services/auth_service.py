@@ -31,6 +31,8 @@ def login_user(email, password):
     hash_stored = existing_user["password_hash"]
     user_id = existing_user["user_id"]
 
+    token = create_access_token({"user_id": existing_user["user_id"]})
+
     if not verify_password(password, hash_stored):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -39,5 +41,7 @@ def login_user(email, password):
 
     return {
         "message": "Login successful",
+        "token": token,
+        "token_type": "bearer",
         "user_id": user_id
     }

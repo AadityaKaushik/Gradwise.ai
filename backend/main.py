@@ -22,3 +22,4 @@ def signup(data: SignupLoginRequest):
 @app.post("/login")
 def login(data: SignupLoginRequest):
     return login_user(data.email, data.password)
+
