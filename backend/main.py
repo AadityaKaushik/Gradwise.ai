@@ -42,4 +42,9 @@ def createorg(
     current_user = Depends(get_current_user)
 ):
     user_id = current_user["user_id"]
+    org = create_org(data.name, user_id)
+    return {
+        "message": "Organization created",
+        "organization": org
+    }
 
