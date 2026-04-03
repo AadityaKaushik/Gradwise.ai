@@ -2,7 +2,9 @@ from fastapi import FastAPI, status
 from pydantic import BaseModel, EmailStr
 from services.auth_service import signup_user, login_user
 from database.organization_queries import create_org
-from Utils.security import create_access_token, verify_access_token
+from Utils.security import create_access_token, verify_access_token, get_current_user
+from fastapi import Request, Depends
+
 app = FastAPI()
 
 class SignupLoginRequest(BaseModel):
@@ -15,16 +17,15 @@ class SignupResponse(BaseModel):
 
 class TokenResponse(BaseModel):
     message: str
-    access_token: str
+    token: str
     token_type: str = "bearer"
     user_id: int
 
 class OrganizationCreateRequest(BaseModel):
     name: str
-    user_id: int
 
 class OrganizationCreateResponse(BaseModel):
-    mesage: str
+    message: str
     org_id: int
 
 @app.post("/signup", response_model=SignupResponse, status_code=status.HTTP_201_CREATED)
@@ -35,8 +36,10 @@ def signup(data: SignupLoginRequest):
 def login(data: SignupLoginRequest):
     return login_user(data.email, data.password)
 
-# @app.post("/organization", reponse_model=OrganizationCreateResponse)
-# def createorg(data: OrganizationCreateRequest):
-#     create
-#     return create_org(data.name, data.user_id)
+@app.post("/organizations")
+def createorg(
+    data: OrganizationCreateRequest,
+    current_user = Depends(get_current_user)
+):
+    user_id = current_user["user_id"]
 
