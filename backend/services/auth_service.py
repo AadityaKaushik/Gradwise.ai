@@ -1,7 +1,7 @@
 from database.user_queries import create_user, get_user_by_email
 from database.connection import get_connection
 from database.user_queries import get_user_by_email, create_user
-from Utils.security import hash_password, verify_password
+from Utils.security import hash_password, verify_password, create_access_token
 
 
 def signup_user(email, password):
