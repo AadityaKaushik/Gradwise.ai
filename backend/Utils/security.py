@@ -44,19 +44,14 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from Utils.security import verify_access_token
 
-# security = HTTPBearer()
+security = HTTPBearer()
 
 
 from fastapi import Request, HTTPException, Header
 
-def get_current_user(authorization: str = Header(None)):
-    if not authorization:
-        raise HTTPException(401, "No token")
-
-    try:
-        token = authorization.split(" ")[1]
-    except:
-        raise HTTPException(401, "Invalid format")
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    
+    token = credentials.credentials  # this extracts the token after "Bearer"
 
     payload = verify_access_token(token)
 
