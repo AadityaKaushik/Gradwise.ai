@@ -30,12 +30,12 @@ def create_access_token(data: dict):
 
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=[ALGORITHM])
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 def verify_access_token(token: str):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         return payload
     except JWTError:
         return None
@@ -44,18 +44,23 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from Utils.security import verify_access_token
 
-security = HTTPBearer()
+# security = HTTPBearer()
 
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    token = credentials.credentials  # extracts the actual token string
+from fastapi import Request, HTTPException, Header
+
+def get_current_user(authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(401, "No token")
+
+    try:
+        token = authorization.split(" ")[1]
+    except:
+        raise HTTPException(401, "Invalid format")
 
     payload = verify_access_token(token)
 
     if payload is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token"
-        )
+        raise HTTPException(401, "Invalid token")
 
-    return payload  # contains user_id (and anything else you encoded)
+    return payload
