@@ -4,6 +4,7 @@ from services.auth_service import signup_user, login_user
 from database.organization_queries import create_org
 from Utils.security import create_access_token, verify_access_token, get_current_user
 from fastapi import Request, Depends
+from services.organization_service import join_organization
 
 app = FastAPI()
 
@@ -25,8 +26,16 @@ class OrganizationCreateRequest(BaseModel):
     name: str
 
 class OrganizationCreateResponse(BaseModel):
+    organization_id: int
+    invite_key: str
+
+class MakeMemberRequest(BaseModel):
+    user_id: int
+    invite_key: str
+
+class MakeMemberResponse(BaseModel):
+    membership_id: int
     message: str
-    org_id: int
 
 @app.post("/signup", response_model=SignupResponse, status_code=status.HTTP_201_CREATED)
 def signup(data: SignupLoginRequest):
@@ -36,15 +45,13 @@ def signup(data: SignupLoginRequest):
 def login(data: SignupLoginRequest):
     return login_user(data.email, data.password)
 
-@app.post("/organizations")
-def createorg(
-    data: OrganizationCreateRequest,
-    current_user = Depends(get_current_user)
-):
+@app.post("/organizations", response_model=OrganizationCreateResponse, status_code=status.HTTP_201_CREATED)
+def createorg(data: OrganizationCreateRequest, current_user = Depends(get_current_user)):
     user_id = current_user["user_id"]
-    org = create_org(data.name, user_id)
-    return {
-        "message": "Organization created",
-        "organization": org
-    }
+    return create_org(data.name, user_id)
+
+@app.post("/membership", response_model=MakeMemberResponse, status_code=status.HTTP_201_CREATED)
+def makemember(data: MakeMemberRequest, current_user = Depends(get_current_user)):
+    user_id = current_user["user_id"]
+    return join_organization(user_id, data.invite_key)
 
