@@ -1,4 +1,5 @@
-from database.connection import get_connection
+from database.connection import get_connection, return_connection
+from fastapi import HTTPException
 
 def view_perms(org_id):
         conn = get_connection()
@@ -23,9 +24,11 @@ def view_perms(org_id):
                 for row in result
             ]
         except Exception as e:
-            print("Error in view_perms:", e)
-            raise
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to fetch organization permissions"
+            )
         finally:
             if cursor:
                 cursor.close()
-            conn.close()
+            return_connection(conn)

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from services.auth_service import signup_user, login_user
 from database.organization_queries import create_org
 from Utils.security import create_access_token, verify_access_token, get_current_user
@@ -10,7 +10,7 @@ app = FastAPI()
 
 class SignupLoginRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, max_length=128)
 
 class SignupResponse(BaseModel):
     message: str
@@ -55,3 +55,4 @@ def makemember(data: MakeMemberRequest, current_user = Depends(get_current_user)
     user_id = current_user["user_id"]
     return join_organization(user_id, data.invite_key)
 
+# @app.get("/organization/{org_id}/membership")

@@ -1,4 +1,5 @@
-from database.connection import get_connection
+from database.connection import get_connection, return_connection
+import psycopg2
 
 def create_user(email, password_hash):
     conn = get_connection()
@@ -28,7 +29,7 @@ def create_user(email, password_hash):
     finally:
         if cursor:
             cursor.close()
-        conn.close()
+        return_connection(conn)
 
 def get_user_by_email(email):
     conn = get_connection()
@@ -58,4 +59,4 @@ def get_user_by_email(email):
     finally:
         if cursor:
             cursor.close()
-        conn.close()
+        return_connection(conn)

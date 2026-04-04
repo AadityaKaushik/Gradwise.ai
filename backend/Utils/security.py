@@ -19,10 +19,11 @@ def verify_password(to_check, stored):
 # JWT AUTHENTICATION WORK
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-
-SECRET_KEY = "Gradwise@2026"
+import os
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("JWT_SECRET_KEY environment variable is not set")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -42,7 +43,6 @@ def verify_access_token(token: str):
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from Utils.security import verify_access_token
 
 security = HTTPBearer()
 
