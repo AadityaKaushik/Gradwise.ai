@@ -5,12 +5,14 @@ from database.organization_queries import create_org
 from Utils.security import create_access_token, verify_access_token, get_current_user
 from fastapi import Request, Depends
 from services.organization_service import join_organization
-
+from database.admin_queries import view_perms
+from typing import List
 app = FastAPI()
 
 class SignupLoginRequest(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=8, max_length=128)
+    # password: str = Field(..., min_length=8, max_length=128)
+    password: str
 
 class SignupResponse(BaseModel):
     message: str
@@ -36,6 +38,10 @@ class MakeMemberRequest(BaseModel):
 class MakeMemberResponse(BaseModel):
     membership_id: int
     message: str
+
+class ViewMembersResponse(BaseModel):
+    user_id: int
+    role: str
 
 @app.post("/signup", response_model=SignupResponse, status_code=status.HTTP_201_CREATED)
 def signup(data: SignupLoginRequest):
@@ -67,4 +73,10 @@ def makemember(data: MakeMemberRequest, current_user = Depends(get_current_user)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
-# @app.get("/organization/{org_id}/membership")
+@app.get("/organization/{org_id}/membership", response_model=List[ViewMembersResponse])
+def viewperms(org_id: int, current_user = Depends(get_current_user)):
+    try:
+        return view_perms(org_id)
+    except RuntimeError as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
