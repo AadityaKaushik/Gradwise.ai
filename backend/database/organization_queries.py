@@ -1,10 +1,6 @@
-from database.connection import get_connection
+from database.connection import get_connection, return_connection
 from Utils.security import generate_org_key
-from database.membership_queries import create_membership
-
-
-from database.connection import get_connection
-from Utils.security import generate_org_key
+import psycopg2
 
 def create_org(name, user_id):
     conn = get_connection()
@@ -12,29 +8,25 @@ def create_org(name, user_id):
     try:
         cursor = conn.cursor()
 
-        cursor.execute(
-            "SELECT organization_id FROM v2.organizations WHERE name = %s",
-            (name,)
-        )
-
-        if cursor.fetchone():
-            raise ValueError("Organization with this name already exists")
-
         org_key = generate_org_key()
 
         cursor.execute("""
             INSERT INTO v2.organizations (name, invite_key)
             VALUES (%s, %s)
+            ON CONFLICT (name) DO NOTHING
             RETURNING organization_id
         """, (name, org_key))
 
-        org_id = cursor.fetchone()[0]
+        row = cursor.fetchone()
+        if not row:
+            raise ValueError("Organization with this name already exists")
+
+        org_id = row[0]
 
         cursor.execute("""
             INSERT INTO v2.organization_memberships (user_id, organization_id, role)
             VALUES (%s, %s, %s)
         """, (user_id, org_id, "Admin"))
-        # membership_result = create_membership(user_id, org_id, "Admin")
 
         conn.commit()
 
@@ -50,11 +42,12 @@ def create_org(name, user_id):
     finally:
         if cursor:
             cursor.close()
-        conn.close()
+        return_connection(conn)
 
 
 def get_org_by_invite_key(invite_key):
     conn = get_connection()
+    cursor = None
     try:
         cursor = conn.cursor()
 
@@ -85,6 +78,6 @@ def get_org_by_invite_key(invite_key):
         raise e
 
     finally:
-        cursor.close()
-        conn.close()
-        
+        if cursor:
+            cursor.close()
+        return_connection(conn)

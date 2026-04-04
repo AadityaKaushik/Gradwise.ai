@@ -1,8 +1,6 @@
 from database.membership_queries import create_membership
-from database.connection import get_connection
+from database.connection import get_connection, return_connection
 from datetime import datetime, timezone
-
-from datetime import datetime
 
 def join_organization(user_id, invite_key):
     conn = get_connection()
@@ -33,7 +31,7 @@ def join_organization(user_id, invite_key):
     finally:
         if cursor:
             cursor.close()
-        conn.close()
+        return_connection(conn)
     
 def get_organizations(user_id):
     conn = get_connection()
@@ -57,4 +55,4 @@ def get_organizations(user_id):
     finally:
         if cursor:
             cursor.close()
-        conn.close()
+        return_connection(conn)
