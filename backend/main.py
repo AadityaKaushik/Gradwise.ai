@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 from services.auth_service import signup_user, login_user
 from database.organization_queries import create_org
@@ -39,20 +39,32 @@ class MakeMemberResponse(BaseModel):
 
 @app.post("/signup", response_model=SignupResponse, status_code=status.HTTP_201_CREATED)
 def signup(data: SignupLoginRequest):
-    return signup_user(data.email, data.password)
+    try:
+        return signup_user(data.email, data.password)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
 @app.post("/login", response_model=TokenResponse)
 def login(data: SignupLoginRequest):
-    return login_user(data.email, data.password)
+    try:
+        return login_user(data.email, data.password)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
 
 @app.post("/organizations", response_model=OrganizationCreateResponse, status_code=status.HTTP_201_CREATED)
 def createorg(data: OrganizationCreateRequest, current_user = Depends(get_current_user)):
     user_id = current_user["user_id"]
-    return create_org(data.name, user_id)
+    try:
+        return create_org(data.name, user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
 @app.post("/membership", response_model=MakeMemberResponse, status_code=status.HTTP_201_CREATED)
 def makemember(data: MakeMemberRequest, current_user = Depends(get_current_user)):
     user_id = current_user["user_id"]
-    return join_organization(user_id, data.invite_key)
+    try:
+        return join_organization(user_id, data.invite_key)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
 # @app.get("/organization/{org_id}/membership")
