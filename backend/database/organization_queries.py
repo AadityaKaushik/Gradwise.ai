@@ -20,7 +20,6 @@ def create_org(name, user_id):
         row = cursor.fetchone()
         org_id, invite_key = row
 
-        # Creator automatically becomes ADMIN
         cursor.execute("""
             INSERT INTO v3.organization_memberships (user_id, organization_id, role)
             VALUES (%s, %s, 'ADMIN')
