@@ -1,18 +1,20 @@
 from database.connection import get_connection, return_connection
 import psycopg2
 
-def create_program(department_id, name, level, duration_years):
+
+def create_program(org_id, department_id, name, level, duration_years):
+    """Create a program. org_id is required for tenant isolation (denormalized)."""
     conn = get_connection()
     cursor = None
     try:
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO v2.programs (department_id, name, level, duration_years)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO v3.programs (organization_id, department_id, name, level, duration_years)
+            VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (department_id, name) DO NOTHING
             RETURNING program_id
-        """, (department_id, name, level, duration_years))
+        """, (org_id, department_id, name, level, duration_years))
 
         row = cursor.fetchone()
         if not row:
@@ -20,7 +22,11 @@ def create_program(department_id, name, level, duration_years):
 
         program_id = row[0]
         conn.commit()
-        return program_id
+
+        return {
+            "program_id": program_id,
+            "message": "Program created successfully"
+        }
 
     except Exception as e:
         conn.rollback()

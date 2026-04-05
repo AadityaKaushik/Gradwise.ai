@@ -1,6 +1,7 @@
 from database.connection import get_connection, return_connection
 import psycopg2
 
+
 def create_user(email, password_hash):
     conn = get_connection()
     cursor = None
@@ -8,7 +9,7 @@ def create_user(email, password_hash):
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO v2.users (email, password_hash)
+            INSERT INTO v3.users (email, password_hash)
             VALUES (%s, %s)
             RETURNING user_id
         """, (email, password_hash))
@@ -31,6 +32,7 @@ def create_user(email, password_hash):
             cursor.close()
         return_connection(conn)
 
+
 def get_user_by_email(email):
     conn = get_connection()
     cursor = None
@@ -39,7 +41,7 @@ def get_user_by_email(email):
 
         cursor.execute("""
             SELECT user_id, email, password_hash
-            FROM v2.users
+            FROM v3.users
             WHERE email = %s
         """, (email,))
 

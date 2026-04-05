@@ -4,7 +4,7 @@ import string
 
 # PASSWORDS AND CRYPTO WORK
 def generate_org_key(length=50):
-    alphabet=string.ascii_letters+string.digits
+    alphabet = string.ascii_letters + string.digits
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
 def hash_password(raw_password):
@@ -18,8 +18,9 @@ def verify_password(to_check, stored):
 
 # JWT AUTHENTICATION WORK
 from jose import jwt, JWTError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
+
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 if not SECRET_KEY:
     raise RuntimeError("JWT_SECRET_KEY environment variable is not set")
@@ -27,7 +28,7 @@ ALGORITHM = "HS256"
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=100)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=100)
 
     to_encode.update({"exp": expire})
 
@@ -50,7 +51,7 @@ security = HTTPBearer()
 from fastapi import Request, HTTPException, Header
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    
+
     token = credentials.credentials  # this extracts the token after "Bearer"
 
     payload = verify_access_token(token)

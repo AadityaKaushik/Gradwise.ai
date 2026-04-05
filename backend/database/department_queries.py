@@ -1,6 +1,7 @@
 from database.connection import get_connection, return_connection
 import psycopg2
 
+
 def create_department(org_id, name, code):
     conn = get_connection()
     cursor = None
@@ -8,10 +9,10 @@ def create_department(org_id, name, code):
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO v2.departments (organization_id, name, code)
+            INSERT INTO v3.departments (organization_id, name, code)
             VALUES (%s, %s, %s)
             ON CONFLICT (organization_id, name) DO NOTHING
-            RETURNING department_id         
+            RETURNING department_id
         """, (org_id, name, code))
 
         row = cursor.fetchone()
@@ -21,7 +22,8 @@ def create_department(org_id, name, code):
         department_id = row[0]
         conn.commit()
 
-        return {"department_id": department_id,
+        return {
+            "department_id": department_id,
             "message": "Department created successfully"
         }
 

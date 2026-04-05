@@ -2,6 +2,7 @@ from database.connection import get_connection, return_connection
 from Utils.security import generate_org_key
 import psycopg2
 
+
 def create_org(name, user_id):
     conn = get_connection()
     cursor = None
@@ -11,29 +12,30 @@ def create_org(name, user_id):
         org_key = generate_org_key()
 
         cursor.execute("""
-            INSERT INTO v2.organizations (name, invite_key)
+            INSERT INTO v3.organizations (name, invite_key)
             VALUES (%s, %s)
-            ON CONFLICT (name) DO NOTHING
-            RETURNING organization_id
+            RETURNING organization_id, invite_key
         """, (name, org_key))
 
         row = cursor.fetchone()
-        if not row:
-            raise ValueError("Organization with this name already exists")
+        org_id, invite_key = row
 
-        org_id = row[0]
-
+        # Creator automatically becomes ADMIN
         cursor.execute("""
-            INSERT INTO v2.organization_memberships (user_id, organization_id, role)
-            VALUES (%s, %s, %s)
-        """, (user_id, org_id, "Admin"))
+            INSERT INTO v3.organization_memberships (user_id, organization_id, role)
+            VALUES (%s, %s, 'ADMIN')
+        """, (user_id, org_id))
 
         conn.commit()
 
         return {
             "organization_id": org_id,
-            "invite_key": org_key
+            "invite_key": invite_key
         }
+
+    except psycopg2.errors.UniqueViolation:
+        conn.rollback()
+        raise ValueError("Organization with this name already exists")
 
     except Exception as e:
         conn.rollback()
@@ -51,28 +53,24 @@ def get_org_by_invite_key(invite_key):
     try:
         cursor = conn.cursor()
 
-        query = """
+        cursor.execute("""
             SELECT organization_id, invite_expires_at
-            FROM v2.organizations
+            FROM v3.organizations
             WHERE invite_key = %s
-        """
-
-        cursor.execute(query, (invite_key,))
+        """, (invite_key,))
 
         result = cursor.fetchone()
 
         if not result:
             raise ValueError("Invalid invite key")
 
-        org_id = result[0]
-        key_expiry = result[1]
+        org_id, key_expiry = result
 
-    
         return {
             "org_id": org_id,
             "key_expiry": key_expiry
         }
-    
+
     except Exception as e:
         conn.rollback()
         raise e

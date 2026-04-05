@@ -42,6 +42,7 @@ class MakeMemberResponse(BaseModel):
 class ViewMembersResponse(BaseModel):
     user_id: int
     role: str
+    status: str
 
 @app.post("/signup", response_model=SignupResponse, status_code=status.HTTP_201_CREATED)
 def signup(data: SignupLoginRequest):
