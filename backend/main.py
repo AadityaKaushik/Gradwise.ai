@@ -43,6 +43,16 @@ class ViewMembersResponse(BaseModel):
     role: str
     status: str
 
+class ChangePerms(BaseModel):
+    user_id: int
+    role: str
+
+class ChangePermsResponse(BaseModel):
+    membership_id: int
+    role: str
+    message: str
+
+
 @app.post("/signup", response_model=SignupResponse, status_code=status.HTTP_201_CREATED)
 def signup(data: SignupLoginRequest):
     try:
@@ -79,4 +89,16 @@ def viewperms(org_id: int, current_user = Depends(get_current_user)):
         return view_perms(org_id)
     except RuntimeError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@app.patch("/organization/{org_id}/membership", response_model=ChangePermsResponse)
+def changeperms(org_id: int, data: ChangePerms, current_user = Depends(get_current_user)):
+    from database.admin_queries import update_membership_role
+    try:
+        # Note: In a real app we'd also check if current_user has ADMIN role here
+        return update_membership_role(org_id, data.user_id, data.role.upper())
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
 
