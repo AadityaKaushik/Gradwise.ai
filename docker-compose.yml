@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: gradwise_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-gradwise}
+    ports:
+      - "5432:5432"
+    volumes:
+      # This magical line tells Postgres to run your schema file automatically the first time it starts!
+      - ./backend/database/v3_schema.sql:/docker-entrypoint-initdb.d/init.sql
+      # This keeps your data safe even if you delete the container
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gradwise_api
+    environment:
+      # The host is 'db', which matches the service name above. Docker networks this automatically!
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_NAME: ${DB_NAME:-gradwise}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your_super_secret_dev_key}
+    ports:
+      - "8000:8000"
+    volumes:
+      # This volume links your local code to the container. 
+      # When you save a file in VS Code, FastAPI will reload instantly!
+      - ./backend:/app
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
