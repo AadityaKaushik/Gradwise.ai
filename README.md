@@ -9,7 +9,7 @@
 
 **Gradwise AI** is an academic intelligence platform designed to help educational institutions manage student data, streamline academic workflows, and unlock AI-driven insights.
 
-This repository currently contains the **foundational backend data layer**, including database connectivity, raw SQL query modules, and a scalable project structure for future API and AI integration.
+This repository contains the **backend system**, including a FastAPI application, pure SQL database connectivity, JWT authentication, and a containerized infrastructure with Docker.
 
 ---
 
@@ -24,52 +24,37 @@ Gradwise aims to become a centralized academic system where:
 
 ---
 
-## 🧱 Backend Architecture
+## 🧱 Architecture
 
 ```
 gradwise-ai/
 │
-└── backend/
-    │
-    ├── database/
-    │   ├── connection.py
-    │   ├── organization_queries.py
-    │   ├── user_queries.py
-    │   ├── membership_queries.py
-    │   └── __init__.py
-    │
-    ├── services/                     
-    │   ├── auth_service.py
-    │   ├── organization_service.py
-    │   └── __init__.py
-    │
-    ├── utils/
-    │   └── security.py               
-    │
-    ├── main.py                       
-    │
-    ├── requirements.txt
-    ├── .env                          
-    └── .gitignore
+├── backend/
+│   ├── database/          # Pure SQL queries and DB connections
+│   ├── services/          # Business logic and auth service
+│   ├── Utils/             # Security, JWT, and helpers
+│   ├── main.py            # FastAPI entrypoint
+│   ├── Dockerfile         # Docker image definition
+│   └── requirements.txt
+│
+└── docker-compose.yml     # API and Postgres container orchestration
 ```
 
 ---
 
-## 🗄️ Database Layer
+## 🗄️ Technology Stack
 
+* **API Framework:** FastAPI
 * **Database:** PostgreSQL
 * **Driver:** psycopg2 (raw SQL — no ORM)
-* **Design:** Schema-driven relational structure
-
-### Current Focus:
-
-* Connection lifecycle management
-* Insert / fetch query pipelines
-* Modular query functions per entity
+* **Authentication:** JWT (JSON Web Tokens)
+* **Containerization:** Docker & Docker Compose
 
 ---
 
-## ⚙️ Local Setup
+## ⚙️ Local Setup & Running (Docker)
+
+The recommended way to run the application is using Docker Compose.
 
 ### 1️⃣ Clone Repository
 
@@ -78,42 +63,26 @@ git clone <repo-url>
 cd gradwise-ai
 ```
 
-### 2️⃣ Create Virtual Environment
+### 2️⃣ Configure Environment Variables
 
-```bash
-python -m venv backend/venv
-backend/venv\Scripts\activate   # Windows
-```
-
-### 3️⃣ Install Dependencies
-
-```bash
-pip install -r backend/requirements.txt
-```
-
-### 4️⃣ Configure Environment Variables
-
-Create a `.env` file inside `backend/`:
+Create a `.env` file inside the `backend/` directory:
 
 ```env
-DB_HOST=localhost
-DB_NAME=your_database_name
 DB_USER=postgres
-DB_PASSWORD=your_password
-DB_PORT=5432
+DB_PASSWORD=password
+DB_NAME=gradwise
+JWT_SECRET_KEY=your_super_secret_dev_key
 ```
 
-⚠️ Do NOT commit this file.
+⚠️ Do NOT commit this file to version control.
 
----
-
-## ▶️ Running the Backend
+### 3️⃣ Run with Docker Compose
 
 ```bash
-python backend/main.py
+docker-compose up --build
 ```
 
-Currently used for testing database queries and connectivity.
+The API will be available at `http://localhost:8000`. You can test the endpoints via the interactive Swagger documentation at `http://localhost:8000/docs`.
 
 ---
 
@@ -131,10 +100,10 @@ Currently used for testing database queries and connectivity.
 
 ## 🔮 Roadmap
 
-* [ ] Complete CRUD operations for core entities
-* [ ] Expand service layer
-* [ ] Integrate FastAPI APIs
-* [ ] Implement authentication & role-based access
+* [x] Complete CRUD operations for core entities
+* [x] Expand service layer
+* [x] Integrate FastAPI APIs
+* [x] Implement authentication & role-based access
 * [ ] Add AI-powered academic insights
 * [ ] Deploy to cloud infrastructure
 
