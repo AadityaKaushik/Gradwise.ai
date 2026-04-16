@@ -2,7 +2,7 @@ from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 from services.auth_service import signup_user, login_user
 from database.organization_queries import create_org
-from Utils.security import create_access_token, verify_access_token, get_current_user
+from Utils.security import create_access_token, verify_access_token, get_current_user, require_org_admin
 from fastapi import Request, Depends
 from services.organization_service import join_organization
 from database.admin_queries import view_perms
@@ -84,17 +84,16 @@ def makemember(data: MakeMemberRequest, current_user = Depends(get_current_user)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
 @app.get("/organization/{org_id}/membership", response_model=List[ViewMembersResponse])
-def viewperms(org_id: int, current_user = Depends(get_current_user)):
+def viewperms(org_id: int, current_user = Depends(require_org_admin)):
     try:
         return view_perms(org_id)
     except RuntimeError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @app.patch("/organization/{org_id}/membership", response_model=ChangePermsResponse)
-def changeperms(org_id: int, data: ChangePerms, current_user = Depends(get_current_user)):
+def changeperms(org_id: int, data: ChangePerms, current_user = Depends(require_org_admin)):
     from database.admin_queries import update_membership_role
     try:
-        # Note: In a real app we'd also check if current_user has ADMIN role here
         return update_membership_role(org_id, data.user_id, data.role.upper())
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

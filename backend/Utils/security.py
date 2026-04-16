@@ -60,3 +60,18 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(401, "Invalid token")
 
     return payload
+
+
+def require_org_admin(org_id: int, current_user: dict = Depends(get_current_user)):
+    from database.membership_queries import get_user_role_in_org
+
+    user_id = current_user["user_id"]
+    role = get_user_role_in_org(user_id, org_id)
+
+    if role != "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not an admin of this organization"
+        )
+
+    return current_user

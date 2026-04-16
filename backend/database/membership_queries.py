@@ -35,3 +35,24 @@ def create_membership(user_id, org_id, role="PENDING"):
         if cursor:
             cursor.close()
         return_connection(conn)
+
+
+def get_user_role_in_org(user_id, org_id):
+    """Returns the user's role in the given org, or None if not a member."""
+    conn = get_connection()
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT role
+            FROM v3.organization_memberships
+            WHERE user_id = %s AND organization_id = %s
+        """, (user_id, org_id))
+
+        row = cursor.fetchone()
+        return row[0] if row else None
+
+    finally:
+        if cursor:
+            cursor.close()
+        return_connection(conn)
