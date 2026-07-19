@@ -2,7 +2,10 @@
 // GRADWISE — APP LOGIC
 // ============================================
 
-const API = 'http://localhost:8000';
+// Auto-detect environment: use localhost for local development, or your deployed backend URL for production
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:8000' 
+    : 'https://YOUR_BACKEND_URL_HERE'; // <-- You will change this when you get your Koyeb URL
 
 const state = {
     token: localStorage.getItem('gw_token') || null,
