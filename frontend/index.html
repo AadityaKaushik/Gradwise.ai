@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradwise AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=5">
+</head>
+<body>
+    <!-- ============================== -->
+    <!-- TOP NAV BAR                     -->
+    <!-- ============================== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <img src="https://raw.githubusercontent.com/AadityaKaushik/Gradwise.ai/refs/heads/main/assets/logo.png" alt="Gradwise Logo">
+        </div>
+        <div class="nav-right" id="nav-right">
+            <!-- Populated by JS -->
+        </div>
+    </nav>
+
+    <!-- ============================== -->
+    <!-- AUTH VIEW (Login / Signup)      -->
+    <!-- ============================== -->
+    <section id="auth-view" class="view active">
+        <div class="auth-container">
+            <div class="auth-header">
+                <img src="https://raw.githubusercontent.com/AadityaKaushik/Gradwise.ai/refs/heads/main/assets/logo.png" alt="Logo">
+                <h1>Welcome to Gradwise</h1>
+            </div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Login</div>
+                <div class="auth-tab" data-tab="signup">Sign Up</div>
+            </div>
+
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" class="form-control" required minlength="8">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="btn-login">
+                    <span>Login</span><span class="spinner hidden"></span>
+                </button>
+            </form>
+
+            <form id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="signup-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signup-password" class="form-control" required minlength="8">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="btn-signup">
+                    <span>Create Account</span><span class="spinner hidden"></span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- DASHBOARD VIEW                  -->
+    <!-- ============================== -->
+    <section id="dashboard-view" class="view">
+        <div class="dashboard-header">
+            <h2>Classes / Organizations</h2>
+            <div style="display:flex;gap:12px">
+                <button class="btn btn-outline" id="btn-open-join">Join Org</button>
+                <button class="btn btn-primary" id="btn-open-create">Create Org</button>
+            </div>
+        </div>
+        <div class="org-grid" id="org-grid">
+            <!-- Org cards injected here -->
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- ORG DETAIL VIEW                 -->
+    <!-- ============================== -->
+    <section id="org-view" class="view">
+        <div class="org-view-header">
+            <button class="back-btn" id="btn-back-dashboard">←</button>
+            <div class="org-view-title" style="flex:1">
+                <h1 id="org-title-display">Organization Name</h1>
+                <p id="org-role-display">Role: PENDING</p>
+            </div>
+            <button class="btn" id="btn-copy-code" style="padding: 8px 16px; font-size: 14px; background: white; color: var(--primary); border: 1px solid var(--primary);">Copy Org Code</button>
+        </div>
+
+        <!-- Org Top Nav -->
+        <div class="org-top-nav">
+            <div class="org-nav-tab active" data-org-tab="academic">Academic Structure</div>
+            <div class="org-nav-tab student-hidden faculty-hidden" data-org-tab="catalog">Course Catalog</div>
+            <div class="org-nav-tab" data-org-tab="people">People</div>
+            <div class="org-nav-tab student-hidden" data-org-tab="teaching">Teaching</div>
+            <div class="org-nav-tab admin-hidden" data-org-tab="attendance">Attendance</div>
+            <div class="org-nav-tab admin-hidden faculty-hidden" data-org-tab="assessments">Assessments</div>
+        </div>
+
+        <!-- TAB: Academic Structure (Dept/Prog) -->
+        <div class="org-tab-content active" id="tab-academic">
+            <div class="org-layout">
+                <div class="org-main" id="dept-boards-container">
+                    <p class="empty-state" id="empty-depts">Loading departments...</p>
+                    <!-- Department Boards injected here -->
+                </div>
+                <div class="org-sidebar">
+                    <div class="sidebar-section open admin-only">
+                        <div class="sidebar-header">Create Department</div>
+                        <div class="sidebar-body" style="display:block;">
+                            <form id="form-dept" class="form-group">
+                                <input type="text" id="dept-name" class="form-control" placeholder="Name" required style="margin-bottom:8px">
+                                <input type="text" id="dept-code" class="form-control" placeholder="Code" required style="margin-bottom:8px">
+                                <button type="submit" class="btn btn-primary" style="width:100%" id="btn-dept">Add Department<span class="spinner hidden"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Course Catalog -->
+        <div class="org-tab-content" id="tab-catalog">
+            <div class="org-layout">
+                <div class="org-main">
+                    <h3 class="offerings-header">Course Catalog</h3>
+                    <div id="catalog-list">
+                        <p class="empty-state">Load catalog here.</p>
+                    </div>
+                </div>
+                <div class="org-sidebar">
+                    <div class="sidebar-section open admin-only">
+                        <div class="sidebar-header">Create Course</div>
+                        <div class="sidebar-body" style="display:block;">
+                            <form id="form-course" class="form-group">
+                                <input type="text" id="course-code" class="form-control" placeholder="Course Code" required style="margin-bottom:8px">
+                                <input type="text" id="course-name" class="form-control" placeholder="Course Name" required style="margin-bottom:8px">
+                                <input type="number" id="course-credits" class="form-control" placeholder="Credits" required style="margin-bottom:8px">
+                                <button type="submit" class="btn btn-primary" style="width:100%" id="btn-course">Add Course<span class="spinner hidden"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: People -->
+        <div class="org-tab-content" id="tab-people">
+            <div class="org-layout">
+                <div class="org-main">
+                    <h3 class="offerings-header" id="people-header">Students & Faculty</h3>
+                    <div id="people-list">
+                        <p class="empty-state">No people registered.</p>
+                    </div>
+                </div>
+                <div class="org-sidebar">
+                    <div class="sidebar-section open admin-only">
+                        <div class="sidebar-header">Register Student</div>
+                        <div class="sidebar-body" style="display:block;">
+                            <form id="form-student" class="form-group">
+                                <select id="student-uid" class="form-control" required style="margin-bottom:8px">
+                                    <option value="" disabled selected>Select User (Pending)</option>
+                                </select>
+                                <select id="student-prog" class="form-control" required style="margin-bottom:8px">
+                                    <option value="" disabled selected>Select Program</option>
+                                </select>
+                                <input type="text" id="student-roll" class="form-control" placeholder="Roll No" required style="margin-bottom:8px">
+                                <input type="number" id="student-year" class="form-control" placeholder="Admission Year" required style="margin-bottom:8px">
+                                <button type="submit" class="btn btn-primary" style="width:100%" id="btn-student">Add Student<span class="spinner hidden"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="sidebar-section open admin-only" style="margin-top: 16px;">
+                        <div class="sidebar-header">Register Faculty</div>
+                        <div class="sidebar-body" style="display:block;">
+                            <form id="form-faculty" class="form-group">
+                                <select id="fac-uid" class="form-control" required style="margin-bottom:8px">
+                                    <option value="" disabled selected>Select User</option>
+                                </select>
+                                <select id="fac-dept" class="form-control" required style="margin-bottom:8px">
+                                    <option value="" disabled selected>Select Department</option>
+                                </select>
+                                <input type="text" id="fac-emp-code" class="form-control" placeholder="Employee Code" required style="margin-bottom:8px">
+                                <input type="text" id="fac-designation" class="form-control" placeholder="Designation (e.g. Professor)" required style="margin-bottom:8px">
+                                <input type="date" id="fac-join-date" class="form-control" required style="margin-bottom:8px">
+                                <button type="submit" class="btn btn-primary" style="width:100%" id="btn-faculty">Add Faculty<span class="spinner hidden"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Teaching -->
+        <div class="org-tab-content" id="tab-teaching">
+            <div class="org-layout">
+                <div class="org-main">
+                    <div style="margin-bottom: 24px;">
+                        <label for="teaching-period-select" style="font-weight: 500; display: block; margin-bottom: 8px;">Select Academic Period</label>
+                        <select id="teaching-period-select" class="form-control" style="width: 100%; max-width: 300px;">
+                            <option value="" disabled selected>Loading periods...</option>
+                        </select>
+                    </div>
+                    <h3 class="offerings-header">Offerings</h3>
+                    <div id="offerings-list">
+                        <p class="empty-state">Select a period to view offerings.</p>
+                    </div>
+                </div>
+                <div class="org-sidebar">
+                    <div class="sidebar-section open admin-only">
+                        <div class="sidebar-header">Create Academic Period</div>
+                        <div class="sidebar-body" style="display:block;">
+                            <form id="form-period" class="form-group">
+                                <input type="text" id="period-label" class="form-control" placeholder="Label (e.g., Fall 2026)" required style="margin-bottom:8px">
+                                <input type="number" id="period-sem" class="form-control" placeholder="Semester Number (e.g., 1)" required style="margin-bottom:8px">
+                                <input type="number" id="period-year" class="form-control" placeholder="Academic Year (e.g., 2026)" required style="margin-bottom:8px">
+                                <input type="date" id="period-start" class="form-control" required style="margin-bottom:8px">
+                                <input type="date" id="period-end" class="form-control" required style="margin-bottom:8px">
+                                <button type="submit" class="btn btn-primary" style="width:100%" id="btn-period">Create Period<span class="spinner hidden"></span></button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section open admin-only" style="margin-top: 16px;">
+                        <div class="sidebar-header">Create Offering</div>
+                        <div class="sidebar-body" style="display:block;">
+                            <form id="form-offering" class="form-group">
+                                <select id="off-course" class="form-control" required style="margin-bottom:8px">
+                                    <option value="" disabled selected>Select Course</option>
+                                </select>
+                                <select id="off-faculty" class="form-control" required style="margin-bottom:8px">
+                                    <option value="" disabled selected>Select Faculty</option>
+                                </select>
+                                <input type="text" id="off-section" class="form-control" placeholder="Section (e.g., A)" required style="margin-bottom:8px" value="A">
+                                <button type="submit" class="btn btn-primary" style="width:100%" id="btn-offering">Create Offering<span class="spinner hidden"></span></button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section open admin-only" style="margin-top: 16px;">
+                        <div class="sidebar-header">Enroll Student</div>
+                        <div class="sidebar-body" style="display:block;">
+                            <form id="form-enroll" class="form-group">
+                                <select id="enr-offering" class="form-control" required style="margin-bottom:8px">
+                                    <option value="" disabled selected>Select Offering</option>
+                                </select>
+                                <select id="enr-student" class="form-control" required style="margin-bottom:8px">
+                                    <option value="" disabled selected>Select Student</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary" style="width:100%" id="btn-enroll">Enroll Student<span class="spinner hidden"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Attendance -->
+        <div class="org-tab-content" id="tab-attendance">
+            <div class="org-layout">
+                <div class="org-main" id="attendance-main-content">
+                    <!-- Student view -->
+                    <div id="student-attendance-view" style="display:none;">
+                        <h3 class="offerings-header">My Attendance</h3>
+                        <div id="student-attendance-list">
+                            <p class="empty-state">Loading attendance...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Assessments (Student Only) -->
+        <div class="org-tab-content" id="tab-assessments">
+            <div class="org-layout">
+                <div class="org-main">
+                    <div id="student-assessments-view" style="display:none;">
+                        <h3 class="offerings-header">My Assessment Scores</h3>
+                        <div id="student-assessments-list">
+                            <p class="empty-state">Loading scores...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- PROGRAM DETAIL VIEW             -->
+    <!-- ============================== -->
+    <section id="prog-view" class="view">
+        <div class="prog-view-header">
+            <button class="back-btn" id="btn-back-org">←</button>
+            <div class="prog-view-title">
+                <h2 id="prog-title-display">Program Name</h2>
+            </div>
+        </div>
+        <div class="org-layout">
+            <div class="org-main">
+                <h3 class="offerings-header" id="prog-courses-header">Mapped Courses</h3>
+                <div id="mapped-courses-list">
+                    <p class="empty-state" id="empty-mapped">Loading courses...</p>
+                </div>
+            </div>
+            <div class="org-sidebar admin-only">
+                <div class="sidebar-section open">
+                    <div class="sidebar-header">Link Course to Program</div>
+                    <div class="sidebar-body" style="display:block;">
+                        <form id="form-map-course" class="form-group">
+                            <select id="map-course-id" class="form-control" required style="margin-bottom:8px">
+                                <option value="" disabled selected>Select Course</option>
+                            </select>
+                            <input type="number" id="map-semester" class="form-control" placeholder="Semester (e.g. 1)" required style="margin-bottom:8px">
+                            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                <input type="checkbox" id="map-is-core" checked> Is Core Course
+                            </label>
+                            <button type="submit" class="btn btn-primary" style="width:100%" id="btn-map-course">Link Course<span class="spinner hidden"></span></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- FACULTY DASHBOARD VIEW          -->
+    <!-- ============================== -->
+    <section id="faculty-dashboard-view" class="view">
+        <div class="org-view-header">
+            <button class="back-btn" id="btn-back-faculty-dash">←</button>
+            <div class="org-title-area">
+                <h2 id="faculty-org-title">Organization Name</h2>
+                <div class="role-badge" id="faculty-role-display">Role: FACULTY</div>
+            </div>
+        </div>
+        <div class="org-layout">
+            <div class="org-main" style="width: 100%; max-width: 1000px; margin: 0 auto; display: block; border-right: none;">
+                <div style="margin-bottom: 24px;">
+                    <label for="faculty-period-select" style="font-weight: 500; display: block; margin-bottom: 8px;">Select Academic Period</label>
+                    <select id="faculty-period-select" class="form-control" style="width: 100%; max-width: 300px;">
+                        <option value="" disabled selected>Loading periods...</option>
+                    </select>
+                </div>
+                <h3 class="offerings-header">My Active Classes</h3>
+                <div id="faculty-offerings-grid" class="prog-grid">
+                    <p class="empty-state">Select a period to view your classes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- FACULTY COURSE VIEW             -->
+    <!-- ============================== -->
+    <section id="faculty-course-view" class="view">
+        <div class="org-view-header">
+            <button class="back-btn" id="btn-back-faculty-course">←</button>
+            <div class="org-title-area">
+                <h2 id="faculty-course-title">Course Name</h2>
+                <div class="role-badge" id="faculty-course-section">Section A</div>
+            </div>
+        </div>
+        
+        <div class="org-nav" style="border-bottom: 1px solid var(--border-color); padding: 0 32px; background: white; margin-bottom: 24px;">
+            <button class="course-nav-tab active" data-target="course-roster-tab">Roster</button>
+            <button class="course-nav-tab" data-target="course-attendance-tab">Attendance</button>
+            <button class="course-nav-tab" data-target="course-assessments-tab">Assessments</button>
+        </div>
+
+        <div class="org-layout">
+            <div class="org-main" style="width: 100%; max-width: 1000px; margin: 0 auto; display: block; border-right: none;">
+                
+                <!-- TAB: Roster -->
+                <div id="course-roster-tab" class="course-tab-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="offerings-header" style="margin:0;">Student Roster</h3>
+                        <div style="font-size: 14px; color: var(--text-secondary);" id="roster-count">Loading students...</div>
+                    </div>
+                    <div id="faculty-roster-list" style="display: flex; flex-direction: column; gap: 12px;">
+                        <p class="empty-state">Loading roster...</p>
+                    </div>
+                </div>
+
+                <!-- TAB: Attendance -->
+                <div id="course-attendance-tab" class="course-tab-content" style="display:none;">
+                    <h3 class="offerings-header">Manage Attendance</h3>
+                    
+                    <div id="fc-attendance-sessions-container" style="margin-bottom: 24px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <h4>Sessions</h4>
+                            <button class="btn btn-primary btn-sm" id="fc-btn-show-create-session">Create Session</button>
+                        </div>
+                        <div id="fc-sessions-list" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:8px;">
+                            <p class="empty-state">Loading sessions...</p>
+                        </div>
+                    </div>
+
+                    <div id="fc-create-session-form-container" class="card" style="display:none; margin-bottom: 24px;">
+                        <h4>Create New Session</h4>
+                        <form id="fc-form-create-session" class="form-group" style="display:flex; gap:12px; margin-top:12px; align-items: center; flex-wrap: wrap;">
+                            <input type="date" id="fc-session-date" class="form-control" required style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; min-width: 150px;">
+                            <input type="text" id="fc-session-topic" class="form-control" placeholder="Session Topic (Optional)" style="flex:1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; min-width: 250px;">
+                            <button type="submit" class="btn btn-primary" id="fc-btn-submit-session">Save<span class="spinner hidden"></span></button>
+                            <button type="button" class="btn" id="fc-btn-cancel-session" style="background:#f1f5f9; color:var(--text-color);">Cancel</button>
+                        </form>
+                    </div>
+
+                    <div id="fc-attendance-marking-container" style="display:none;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                            <h4 id="fc-current-session-label">Session: </h4>
+                            <button class="btn btn-primary" id="fc-btn-save-attendance">Save Attendance<span class="spinner hidden"></span></button>
+                        </div>
+                        <div id="fc-attendance-roster"></div>
+                    </div>
+                </div>
+
+                <!-- TAB: Assessments -->
+                <div id="course-assessments-tab" class="course-tab-content" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h3 class="offerings-header" style="margin:0;">Manage Assessments</h3>
+                        <button class="btn btn-primary btn-sm" id="fc-btn-show-create-assessment">Create Assessment</button>
+                    </div>
+                    
+                    <div id="fc-assessments-list-container" style="margin-bottom: 24px;">
+                        <div id="fc-assessments-list" style="display:flex; gap:12px; overflow-x:auto; padding-bottom:8px;">
+                            <p class="empty-state">Loading assessments...</p>
+                        </div>
+                    </div>
+
+                    <div id="fc-create-assessment-form-container" class="card" style="display:none; margin-bottom: 24px;">
+                        <h4>Create New Assessment</h4>
+                        <form id="fc-form-create-assessment" class="form-group" style="margin-top:12px;">
+                            <div style="display:flex; gap:12px; margin-bottom:12px;">
+                                <input type="text" id="fc-assessment-title" class="form-control" placeholder="Title (e.g. Midterm 1)" required style="flex:2;">
+                                <select id="fc-assessment-type" class="form-control" required style="flex:1;">
+                                    <option value="" disabled selected>Type</option>
+                                    <option value="MIDTERM">Midterm</option>
+                                    <option value="FINAL">Final</option>
+                                    <option value="ASSIGNMENT">Assignment</option>
+                                    <option value="QUIZ">Quiz</option>
+                                    <option value="PROJECT">Project</option>
+                                    <option value="LAB">Lab</option>
+                                    <option value="PRESENTATION">Presentation</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:12px; margin-bottom:16px;">
+                                <input type="number" id="fc-assessment-max-marks" class="form-control" placeholder="Max Marks" required min="1">
+                                <input type="number" id="fc-assessment-weightage" class="form-control" placeholder="Weightage %" required min="1" max="100">
+                                <input type="date" id="fc-assessment-date" class="form-control" required>
+                            </div>
+                            <div style="display:flex; gap:12px;">
+                                <button type="submit" class="btn btn-primary" id="fc-btn-submit-assessment">Create<span class="spinner hidden"></span></button>
+                                <button type="button" class="btn" id="fc-btn-cancel-assessment" style="background:#f1f5f9; color:var(--text-color);">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="fc-assessment-grading-container" style="display:none;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                            <div>
+                                <h4 id="fc-current-assessment-label" style="margin-bottom: 4px;">Assessment: </h4>
+                                <p style="font-size: 13px; color: var(--text-secondary);" id="fc-current-assessment-meta">Max Marks: -</p>
+                            </div>
+                        </div>
+                        <div id="fc-assessment-roster" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- MODALS                          -->
+    <!-- ============================== -->
+    <div class="modal-overlay" id="join-org-modal">
+        <div class="modal">
+            <h3>Join Organization</h3>
+            <form id="form-join-org">
+                <div class="form-group">
+                    <label>Invite Key</label>
+                    <input type="text" id="join-invite-key" class="form-control" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-join">Join<span class="spinner hidden"></span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="create-org-modal">
+        <div class="modal">
+            <h3>Create Organization</h3>
+            <form id="form-create-org">
+                <div class="form-group">
+                    <label>Organization Name</label>
+                    <input type="text" id="create-org-name" class="form-control" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-create">Create<span class="spinner hidden"></span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="create-prog-modal">
+        <div class="modal">
+            <h3>Add Program</h3>
+            <form id="form-create-prog">
+                <!-- Dept ID will be injected by JS before submit -->
+                <input type="hidden" id="prog-dept-id">
+                <div class="form-group">
+                    <label>Program Name (e.g. B.Tech CS)</label>
+                    <input type="text" id="prog-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Level (e.g. UG, PG)</label>
+                    <input type="text" id="prog-level" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration (Years)</label>
+                    <input type="number" id="prog-duration" class="form-control" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-prog">Add<span class="spinner hidden"></span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================== -->
+    <!-- TOAST CONTAINER                 -->
+    <!-- ============================== -->
+    <div id="toast-container"></div>
+
+    <script src="app.js?v=6"></script>
+</body>
+</html>

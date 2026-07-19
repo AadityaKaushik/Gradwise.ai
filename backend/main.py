@@ -7,7 +7,17 @@ from fastapi import Request, Depends
 from services.organization_service import join_organization
 from database.admin_queries import view_perms
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class SignupLoginRequest(BaseModel):
     email: EmailStr
@@ -75,6 +85,19 @@ def createorg(data: OrganizationCreateRequest, current_user = Depends(get_curren
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
+class OrganizationListItem(BaseModel):
+    organization_id: int
+    role: str
+    status: str
+    name: str
+    invite_key: str
+
+@app.get("/organizations", response_model=List[OrganizationListItem])
+def listorgs(current_user = Depends(get_current_user)):
+    from services.organization_service import get_organizations
+    user_id = current_user["user_id"]
+    return get_organizations(user_id)
+
 @app.post("/membership", response_model=MakeMemberResponse, status_code=status.HTTP_201_CREATED)
 def makemember(data: MakeMemberRequest, current_user = Depends(get_current_user)):
     user_id = current_user["user_id"]
@@ -101,3 +124,18 @@ def changeperms(org_id: int, data: ChangePerms, current_user = Depends(require_o
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
+# ── Include New Routers ──────────────────────────────────────────────
+
+from routes.academic_router import router as academic_router
+from routes.people_router import router as people_router
+from routes.teaching_router import router as teaching_router
+from routes.assessment_router import router as assessment_router
+from routes.attendance_router import router as attendance_router
+from routes.results_router import router as results_router
+
+app.include_router(academic_router)
+app.include_router(people_router)
+app.include_router(teaching_router)
+app.include_router(assessment_router)
+app.include_router(attendance_router)
+app.include_router(results_router)

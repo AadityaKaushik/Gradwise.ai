@@ -42,16 +42,24 @@ def get_organizations(user_id):
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT organization_id, role, status
-            FROM v3.organization_memberships
-            WHERE user_id = %s
+            SELECT om.organization_id, om.role, om.status, o.name, o.invite_key
+            FROM v3.organization_memberships om
+            JOIN v3.organizations o ON o.organization_id = om.organization_id
+            WHERE om.user_id = %s
+            ORDER BY o.name
         """, (user_id,))
 
         rows = cursor.fetchall()
 
         return [
-            {"organization_id": org_id, "role": role, "status": status}
-            for org_id, role, status in rows
+            {
+                "organization_id": r[0],
+                "role": r[1],
+                "status": r[2],
+                "name": r[3],
+                "invite_key": r[4]
+            }
+            for r in rows
         ]
 
     finally:

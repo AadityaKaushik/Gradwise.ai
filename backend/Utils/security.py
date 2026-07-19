@@ -75,3 +75,37 @@ def require_org_admin(org_id: int, current_user: dict = Depends(get_current_user
         )
 
     return current_user
+
+
+def require_org_member(org_id: int, current_user: dict = Depends(get_current_user)):
+    """Requires the user to be a non-PENDING member of the organization."""
+    from database.membership_queries import get_user_role_in_org
+
+    user_id = current_user["user_id"]
+    role = get_user_role_in_org(user_id, org_id)
+
+    if not role or role == "PENDING":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not an active member of this organization"
+        )
+
+    current_user["org_role"] = role
+    return current_user
+
+
+def require_faculty_or_admin(org_id: int, current_user: dict = Depends(get_current_user)):
+    """Requires the user to be FACULTY or ADMIN in the organization."""
+    from database.membership_queries import get_user_role_in_org
+
+    user_id = current_user["user_id"]
+    role = get_user_role_in_org(user_id, org_id)
+
+    if role not in ("ADMIN", "FACULTY"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You must be faculty or admin in this organization"
+        )
+
+    current_user["org_role"] = role
+    return current_user
