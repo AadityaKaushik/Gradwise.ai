@@ -5,11 +5,11 @@ from database.program_queries import get_program_by_id
 
 
 def register_student(user_id, org_id, program_id, roll_no, admission_year):
-    """Register a student profile. Requires the user to have STUDENT membership role."""
+    """Register a student profile. Promotes PENDING users to STUDENT."""
     role = get_user_role_in_org(user_id, org_id)
-    if role != "STUDENT":
+    if role not in ["STUDENT", "PENDING"]:
         raise ValueError(
-            f"User must have STUDENT membership role (current role: {role or 'not a member'})"
+            f"User must have STUDENT or PENDING membership role (current role: {role or 'not a member'})"
         )
 
     # Check if student profile already exists
@@ -17,21 +17,29 @@ def register_student(user_id, org_id, program_id, roll_no, admission_year):
     if existing:
         raise ValueError("Student profile already exists for this user")
 
+    if role == "PENDING":
+        from database.admin_queries import update_membership_role
+        update_membership_role(org_id, user_id, "STUDENT")
+
     return create_student(user_id, org_id, program_id, roll_no, admission_year)
 
 
 def register_faculty(user_id, org_id, employee_code, department_id, designation=None, joining_date=None):
-    """Register a faculty profile. Requires the user to have FACULTY membership role."""
+    """Register a faculty profile. Promotes PENDING users to FACULTY."""
     role = get_user_role_in_org(user_id, org_id)
-    if role != "FACULTY":
+    if role not in ["FACULTY", "PENDING"]:
         raise ValueError(
-            f"User must have FACULTY membership role (current role: {role or 'not a member'})"
+            f"User must have FACULTY or PENDING membership role (current role: {role or 'not a member'})"
         )
 
     # Check if faculty profile already exists
     existing = get_faculty_by_user_id(user_id)
     if existing:
         raise ValueError("Faculty profile already exists for this user")
+
+    if role == "PENDING":
+        from database.admin_queries import update_membership_role
+        update_membership_role(org_id, user_id, "FACULTY")
 
     return create_faculty(user_id, org_id, employee_code, department_id, designation, joining_date)
 
