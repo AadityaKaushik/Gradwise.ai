@@ -7,11 +7,12 @@ def view_perms(org_id):
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT user_id, role, status
-            FROM v3.organization_memberships
-            WHERE organization_id = %s
+            SELECT om.user_id, u.email, om.role, om.status
+            FROM v3.organization_memberships om
+            JOIN v3.users u ON u.user_id = om.user_id
+            WHERE om.organization_id = %s
             ORDER BY
-                CASE role
+                CASE om.role
                     WHEN 'ADMIN' THEN 1
                     WHEN 'FACULTY' THEN 2
                     WHEN 'STUDENT' THEN 3
@@ -22,7 +23,7 @@ def view_perms(org_id):
 
         result = cursor.fetchall()
         return [
-            {"user_id": row[0], "role": row[1], "status": row[2]}
+            {"user_id": row[0], "email": row[1], "role": row[2], "status": row[3]}
             for row in result
         ]
 

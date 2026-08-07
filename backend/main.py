@@ -50,6 +50,7 @@ class MakeMemberResponse(BaseModel):
 
 class ViewMembersResponse(BaseModel):
     user_id: int
+    email: str
     role: str
     status: str
 
